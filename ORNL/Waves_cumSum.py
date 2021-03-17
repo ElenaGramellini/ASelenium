@@ -18,10 +18,23 @@ parser.add_argument("temperature", nargs='?', default = "293k", type = str, help
 args = parser.parse_args()
 SUBFOLDER = args.name
 TEMP      = args.temperature # "293k" # <-- temperature subfolder
-HEAD      = "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/"+SUBFOLDER+"/%s/" % TEMP 
-FOLDERS = glob.glob(HEAD+"*/")
+thick = "3.2"
+#HEAD      = "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/"+SUBFOLDER+"/%s/" % TEMP
+HEAD    = "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_"+thick+"um/*k/*_-500*/" # % TEMP 
+FOLDERS = glob.glob(HEAD)
 FOLDERS.sort()
-FOLDERS
+folderDic = {}
+awful = []
+for i in FOLDERS:
+    key = int(i.split("/")[8][:-1])
+    folderDic[key] = i
+    awful.append(key)
+awful.sort()
+FOLDERS = []
+for k in awful:
+    FOLDERS.append(folderDic[k])
+
+
 
 class DATA:
     X = np.array([])
@@ -33,6 +46,9 @@ Data = dict()
 counter = 0
 length = 25002 
 #print("board temp volt	area lowerTick upperTick lowerTime upperTime")
+
+fig, axs = plt.subplots(1)  
+
 for FOLDER in FOLDERS:
     TMP_FILES = glob.glob(FOLDER+"*.trc")
     TMP_FILES.sort()    
@@ -67,26 +83,31 @@ for FOLDER in FOLDERS:
     upperBound = zero_crossings[index+1]
     smallYPortion = Data[counter].Ys[lowerBound:upperBound]
     smallXPortion = Data[counter].X[lowerBound:upperBound]
+    smallYCum     = np.cumsum(np.abs(smallYPortion))
+
     area = trapz(smallYPortion) #Data[ct].Ys, [0,0.002], dx=5)
     labels = FOLDER.split("/")[6:-1]
-    #lineToFile = labels[0],labels[1],labels[2], area, upperBound, upperBound-lowerBound
+    labels = labels[1][6:]+ " "+ labels[2] + " "+ (labels[3][:-1]).split("_")[1]+ " V"
+    print(labels)
+    '''
     w = (labels[3])[:-1]
-    w = (w.split("_"))[1]
-    #try:
-    print(labels[0],(labels[1])[:-1],w, area, lowerBound, upperBound, Data[counter].X[lowerBound], Data[counter].X[upperBound])
-    #except ValueError:
-    #    x=1
-        
+    w = (w.split("_"))[2]
+    try:
+        print(labels[1],int((labels[2])[:-1]),int(w), area, lowerBound, upperBound, Data[counter].X[lowerBound], Data[counter].X[upperBound])
+    except ValueError:
+        x=1
+    '''    
 
-    plt.plot(Data[counter].X, Data[counter].Ys,label="full waveform "+labels[2])
-    plt.plot(smallXPortion, smallYPortion,'k',label="integral portion "+labels[2])
-    plt.xlabel(r'Time [s]'); plt.ylabel('Voltaeg [V]'); plt.title('1.6 um ' + str(TEMP)+' '+SUBFOLDER)
+    axs.plot(smallXPortion, smallYCum,label=labels)
+    axs.set_xlabel(r'Time [s]'); axs.set_ylabel('Integrated Voltage [V]');
+    axs.set_title('Cumulatives  ')
     plt.xticks(); plt.yticks(); plt.grid()
-    #plt.legend(('+500', '+250', '0', '-250', '-500'))
-    plt.legend()
-    plt.show()
-
     counter += 1
+    
+plt.legend()
+plt.show()
+fig.savefig("Cumulative"+thick+".png", dpi=fig.dpi)
+
 
 # area1 = trapz(Data[0].Ys, [0,0.002], dx=5) 
 # area2 = trapz(Data[1].Ys, [0,0.002], dx=5)

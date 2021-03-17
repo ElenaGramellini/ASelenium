@@ -13,15 +13,14 @@ from numpy import trapz
 import argparse
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument("name", nargs='?', default = "Xenon_1.6um", type = str, help="insert first  FileName")
 parser.add_argument("temperature", nargs='?', default = "293k", type = str, help="insert first  FileName")
 args = parser.parse_args()
-SUBFOLDER = args.name
 TEMP      = args.temperature # "293k" # <-- temperature subfolder
-HEAD      = "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/"+SUBFOLDER+"/%s/" % TEMP 
-FOLDERS = glob.glob(HEAD+"*/")
-FOLDERS.sort()
-FOLDERS
+HEAD1      = "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/293k/" 
+HEAD2      = "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/293_2/"
+FOLDERS = glob.glob(HEAD1+"*/") + glob.glob(HEAD2+"*/")
+print(FOLDERS)
+
 
 class DATA:
     X = np.array([])
@@ -69,15 +68,12 @@ for FOLDER in FOLDERS:
     smallXPortion = Data[counter].X[lowerBound:upperBound]
     area = trapz(smallYPortion) #Data[ct].Ys, [0,0.002], dx=5)
     labels = FOLDER.split("/")[6:-1]
-    #lineToFile = labels[0],labels[1],labels[2], area, upperBound, upperBound-lowerBound
     w = (labels[3])[:-1]
     w = (w.split("_"))[1]
-    #try:
-    print(labels[0],(labels[1])[:-1],w, area, lowerBound, upperBound, Data[counter].X[lowerBound], Data[counter].X[upperBound])
-    #except ValueError:
-    #    x=1
-        
+    print(labels[2],w, area, lowerBound, upperBound, Data[counter].X[lowerBound], Data[counter].X[upperBound])
 
+        
+    '''
     plt.plot(Data[counter].X, Data[counter].Ys,label="full waveform "+labels[2])
     plt.plot(smallXPortion, smallYPortion,'k',label="integral portion "+labels[2])
     plt.xlabel(r'Time [s]'); plt.ylabel('Voltaeg [V]'); plt.title('1.6 um ' + str(TEMP)+' '+SUBFOLDER)
@@ -85,7 +81,7 @@ for FOLDER in FOLDERS:
     #plt.legend(('+500', '+250', '0', '-250', '-500'))
     plt.legend()
     plt.show()
-
+    '''
     counter += 1
 
 # area1 = trapz(Data[0].Ys, [0,0.002], dx=5) 
