@@ -6,9 +6,7 @@ import itertools
 
 
 # Importing the full MC data frames for Run 1 and Run 3
-#df = pd.read_csv("ExperimentSummaryTable.csv",delim_whitespace=True)
-df = pd.read_csv("Baseline.csv",delim_whitespace=True)
-
+df = pd.read_csv("ExperimentSummaryTable_4.csv",delim_whitespace=True)
 
 # Comparison with Bare Board
 df_bare = df.query("volt == -500 and board==\"Xenon_Bare\"")
@@ -16,12 +14,21 @@ df_16um = df.query("volt == -500 and board==\"Xenon_1.6um\"")
 print(df_bare)
 print(df_16um)
 
+print(df_bare.columns)
+
+
+df_bare = df_bare.astype({'temp': int})
+df_16um = df_16um.astype({'temp': int})
+df_bare = df_bare.sort_values(by='temp',axis=0)
+df_16um = df_16um.sort_values(by='temp',axis=0)
+
+
 fig, axs = plt.subplots(1)
-axs.scatter(df_bare['temp'],-1*df_bare['area'],label="ASe Coating")
-axs.scatter(df_16um['temp'],-1*df_16um['area'],label="No Coating")
-axs.set_title('Source: Xenon Flash Lamp')
+axs.errorbar(df_bare['temp'],df_bare['area'],yerr=df_bare['areaStd'],label=" No Coating",marker="o",markersize=5.,lw=0.5)
+axs.errorbar(df_16um['temp'],df_16um['area'],yerr=df_16um['areaStd'],label="ASe Coating",marker="o",markersize=5.,lw=0.5)
+axs.set_title('Source: Xenon Flash Lamp -- ASe thickness 1.6 um -- V = -500 V')
 axs.set_xlabel(r'temp [K]');
-axs.set_ylabel('Pulse Area')
+axs.set_ylabel('Pulse Area [V*s]')
 plt.grid()
 plt.legend()
 plt.show()
@@ -36,15 +43,27 @@ df0   = df.query("volt == 0 and board==\"Xenon_1.6um\"")
 df250 = df.query("volt == 250 and board==\"Xenon_1.6um\"")
 df25m = df.query("volt == -250 and board==\"Xenon_1.6um\"")
 
+
+df500 = df500.astype({'temp': int})
+df500 = df500.sort_values(by='temp',axis=0)
+df250 = df250.astype({'temp': int})
+df250 = df250.sort_values(by='temp',axis=0)
+df0   = df0  .astype({'temp': int})
+df0   = df0  .sort_values(by='temp',axis=0)
+df50m = df50m.astype({'temp': int})
+df50m = df50m.sort_values(by='temp',axis=0)
+df25m = df25m.astype({'temp': int})
+df25m = df25m.sort_values(by='temp',axis=0)
+
 fig, axs = plt.subplots()
-axs.scatter(df500['temp'], df500['area'],label="500 V")
-axs.scatter(df250['temp'], df250['area'],label="250 V")
-axs.scatter(df0  ['temp'],   df0['area'],label="0 V",color='black')
-axs.scatter(df25m['temp'], -1*df25m['area'],label="-250 V")
-axs.scatter(df50m['temp'], -1*df50m['area'],label="-500 V")
-axs.set_title('Source: Xenon Flash Lamp -- Thickness: 1.6 um') 
+axs.errorbar(df500['temp'], df500['area'],yerr=df500['areaStd'],label="500 V",marker="o",markersize=5.,lw=0.5)
+axs.errorbar(df250['temp'], df250['area'],yerr=df250['areaStd'],label="250 V",marker="o",markersize=5.,lw=0.5)
+axs.errorbar(df0  ['temp'],   df0['area'],yerr=  df0['areaStd'],label="0 V",color='black',marker="o",markersize=5.,lw=0.5)
+axs.errorbar(df25m['temp'], df25m['area'],yerr=df25m['areaStd'],label="-250 V",marker="o",markersize=5.,lw=0.5)
+axs.errorbar(df50m['temp'], df50m['area'],yerr=df50m['areaStd'],label="-500 V",marker="o",markersize=5.,lw=0.5)
+axs.set_title('Source: Xenon Flash Lamp -- ASe thickness 1.6 um -- T = 293 k')
 axs.set_xlabel(r'temp [K]');
-axs.set_ylabel('Pulse Area')
+axs.set_ylabel('Pulse Area [V*s]')
 plt.legend()
 plt.grid()
 plt.show()

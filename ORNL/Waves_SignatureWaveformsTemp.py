@@ -20,12 +20,18 @@ SUBFOLDER = args.name
 TEMP      = args.temperature # "293k" # <-- temperature subfolder
 HEAD      = "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/"+SUBFOLDER+"/%s/" % TEMP 
 
-dictionaryFolders = {"1_500v":"500 V", "2_250v":"250 V", "3_0v":"0 V", "4_-250v":"-250 V", "5_-500v":"-500 V"}
+dictionaryFolders = {"5_-500v":"500 V"}
 
-FOLDERS = glob.glob("/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_3.2um/29*k/*/")
+FOLDERS = glob.glob("/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/*k/1_500v/")
 FOLDERS.sort()
 print(FOLDERS)
-
+volts = "5_-500v/"
+FOLDERS = ["/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/293k/"+volts,
+           "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/230k/"+volts,
+           "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/160k/"+volts,
+           "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/87k/"+volts,
+           "/Users/elenag/Desktop/ORNL/ASelenium/ORNL/Xenon_1.6um/78k/"+volts,           
+           ]
 
 
 class DATA:
@@ -44,6 +50,7 @@ for FOLDER in FOLDERS:
     TMP_FILES = glob.glob(FOLDER+"*.trc")
     TMP_FILES.sort()    
     DAT = DATA()
+    TEMP = FOLDER.split('/')[-3]  
     DAT.X = np.zeros(length); DAT.Y = np.zeros(length); DAT.Y_Std = np.zeros(length)
     yArray2D = np.zeros((len(TMP_FILES),length))
 
@@ -95,20 +102,20 @@ for FOLDER in FOLDERS:
         
     #plt.errorbar(Data[counter].X, Data[counter].Ys, Data[counter].Y_Std)
     #plt.plot(Data[counter].X, Data[counter].Ys,label="full waveform "+labels[2],linewidth=2.0)
-    
-    ###########axs.fill_between(Data[counter].X, Data[counter].Ys-Data[counter].Y_Std,Data[counter].Ys+Data[counter].Y_Std, alpha=0.5)
-    
-    axs.plot(Data[counter].X, Data[counter].Ys,label="Voltage: "+dictionaryFolders[labels[3]] ,linewidth=1.0)
+
+    axs.fill_between(Data[counter].X, Data[counter].Ys-Data[counter].Y_Std,Data[counter].Ys+Data[counter].Y_Std, alpha=0.5)
+    axs.plot(Data[counter].X, Data[counter].Ys,label="Temperatue: "+TEMP ,linewidth=1.0)
     #plt.plot(Data[counter].X, Data[counter].Y,label="full waveform "+labels[2],linewidth=1.0)
     #plt.plot(smallXPortion, smallYPortion,'k',label="integral portion "+labels[2],linewidth=2.0)
-    axs.set_xlabel(r'Time [s]'); axs.set_ylabel('Voltage [V]'); axs.set_title('Xenon Flash Lamp, T = 293k, ASe Thickness: 3.2 um ')
+    axs.set_xlabel(r'Time [s]'); axs.set_ylabel('Voltage [V]'); axs.set_title('Xenon Flash Lamp, V = -500 V, ASe Thickness: 1.6 um ')
     plt.xticks(); plt.yticks(); plt.grid()
 
     counter += 1
 
 plt.legend()
 plt.show()
-fig.savefig("WaveForms.png")
+plt.grid()
+fig.savefig("WaveFormsTemp.png")
 
 
 
